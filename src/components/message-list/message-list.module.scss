@@ -1,0 +1,22 @@
+.wrapper {
+  background-color: rgba(116, 177, 230, 0.7);
+  width: 100%;
+  border: 1px solid rgb(150, 145, 145);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  & .chat {
+    text-align: start;
+    word-break: break-all;
+    border-bottom: 1px solid rgb(150, 145, 145);
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+}
+
+.input {
+  background-color: #ffffff;
+  padding: 10px;
+  box-sizing: border-box;
+}
