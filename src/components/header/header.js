@@ -59,7 +59,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const menu = [
   { title: "Home", to: "/" },
   { title: "Chat", to: "/chat" },
-  { title: "Profile", to: "/profile" },
 ];
 
 export function Header() {
@@ -68,10 +67,6 @@ export function Header() {
 
   const isMenuOpen = Boolean(anchorEl);
   // const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -224,7 +219,7 @@ export function Header() {
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
+              onClick={() => window.location.assign("/profile")}
               color="inherit"
             >
               <AccountCircle />

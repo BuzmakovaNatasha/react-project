@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { nanoid } from "nanoid";
 import { Input, InputAdornment } from "@mui/material";
 import { Send } from "@mui/icons-material";
@@ -8,6 +9,7 @@ import { Message } from "./message";
 
 export function MessageList() {
   const { roomId } = useParams();
+  const profile = useSelector((state) => state.profile);
 
   const [value, setValue] = useState("");
 
@@ -29,7 +31,7 @@ export function MessageList() {
   };
 
   const sendMessage = useCallback(
-    (message, author = "User User") => {
+    (message, author = `${profile.firstName} ${profile.lastName}`) => {
       if (message) {
         setMessagesList((state) => ({
           ...state,
@@ -43,13 +45,13 @@ export function MessageList() {
             },
           ],
         }));
-        if (author === "User User") {
+        if (author === `${profile.firstName} ${profile.lastName}`) {
           // проверка для того, чтобы поле ввода не очищалось, если ответил бот, а в поле ввода уже что-то успели написать
           setValue(""); // очищаем поле ввода
         }
       }
     },
-    [roomId]
+    [roomId, profile]
   );
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export function MessageList() {
 
     scrollToBottom();
 
-    if (lastMessage?.author === "User User") {
+    if (lastMessage?.author === `${profile.firstName} ${profile.lastName}`) {
       timerId = setTimeout(() => {
         sendMessage("Hello! I'm a bot. How are you?", roomId);
       }, 1500);
@@ -71,7 +73,7 @@ export function MessageList() {
     return () => {
       clearInterval(timerId);
     };
-  }, [sendMessage, messagesList, roomId]);
+  }, [sendMessage, messagesList, roomId, profile]);
 
   const handlePressInput = ({ code }) => {
     if (code === "Enter" || code === "NumpadEnter") {
