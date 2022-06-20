@@ -1,29 +1,60 @@
 import * as React from "react";
-import { useState } from "react";
+import { useCallback } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { nanoid } from "nanoid";
 import List from "@mui/material/List";
-import { Link, useParams } from "react-router-dom";
-import { Chat } from "./chat";
+import { Button } from "@mui/material";
 import styles from "./chat-list.module.scss";
+import { Chat } from "./chat";
+import {
+  createConversation,
+  deleteConversation,
+  conversationsSelector,
+} from "../../store/conversations";
 
 export function ChatList() {
-  const { roomId } = useParams();
+  const conversations = useSelector(conversationsSelector);
 
-  const [chats] = useState([
-    { name: "Вася Петров", id: nanoid(), text: "Привет!" },
-    { name: "Катя Краснова", id: nanoid(), text: "Добрый день!" },
-    { name: "Таня Морозова", id: nanoid(), text: "Как дела?" },
-    { name: "Иван Бочкин", id: nanoid(), text: "Жизнь прекрасна!" },
-    { name: "Витя Смирнов", id: nanoid(), text: "Hello!!!" },
-    { name: "Лена Козлова", id: nanoid(), text: "До свидания." },
-  ]);
+  const { roomId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const createConversationByName = () => {
+    const roomName = prompt("Введите название комнаты");
+    const isValidName = conversations.find((conversation) => {
+      return conversation.name === roomName;
+    });
+
+    if (!!roomName && !isValidName) {
+      dispatch(createConversation({ name: roomName, id: nanoid() }));
+    } else {
+      alert("Некорректное название комнаты");
+    }
+  };
+
+  const deleteConversationByName = useCallback(
+    (id, name, event) => {
+      event.preventDefault();
+      dispatch(deleteConversation({ id, name }));
+      navigate("/chat");
+    },
+    [dispatch, navigate]
+  );
 
   return (
     <div className={styles.padding}>
+      <Button onClick={createConversationByName} variant="contained">
+        Create room
+      </Button>
       <List>
-        {chats.map((chat) => (
+        {conversations.map((chat) => (
           <Link key={chat.id} to={`/chat/${chat.name}`}>
-            <Chat chat={chat} selected={roomId === chat.name} />
+            <Chat
+              chat={chat}
+              deleteConversationByName={deleteConversationByName}
+              selected={roomId === chat.name}
+            />
           </Link>
         ))}
       </List>

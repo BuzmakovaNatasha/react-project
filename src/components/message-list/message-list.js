@@ -1,23 +1,37 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { nanoid } from "nanoid";
+import { useSelector, useDispatch } from "react-redux";
+// import { nanoid } from "nanoid";
 import { Input, InputAdornment } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import styles from "./message-list.module.scss";
 import { Message } from "./message";
+import {
+  sendMessage,
+  messagesSelector,
+  profileSelector,
+} from "../../store/messages";
 
 export function MessageList() {
   const { roomId } = useParams();
-  const profile = useSelector((state) => state.profile);
+  const dispatch = useDispatch();
+
+  const profile = useSelector(profileSelector);
+
+  const selectorMessages = useMemo(() => messagesSelector(roomId), [roomId]);
+  const messages = useSelector(selectorMessages);
 
   const [value, setValue] = useState("");
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
-
-  const [messagesList, setMessagesList] = useState({});
 
   const inputRef = useRef();
   const messagesRef = useRef();
@@ -30,64 +44,61 @@ export function MessageList() {
     });
   };
 
-  const sendMessage = useCallback(
+  const send = useCallback(
     (message, author = `${profile.firstName} ${profile.lastName}`) => {
       if (message) {
-        setMessagesList((state) => ({
-          ...state,
-          [roomId]: [
-            ...(state[roomId] ?? []),
-            {
-              author,
-              message,
-              id: nanoid(),
-              date: new Date(),
-            },
-          ],
-        }));
+        dispatch(sendMessage(roomId, { message, author }));
+        // setMessagesList((state) => ({
+        //   ...state,
+        //   [roomId]: [
+        //     ...(state[roomId] ?? []),
+        //     {
+        //       author,
+        //       message,
+        //       id: nanoid(),
+        //       date: new Date(),
+        //     },
+        //   ],
+        // }));
         if (author === `${profile.firstName} ${profile.lastName}`) {
           // проверка для того, чтобы поле ввода не очищалось, если ответил бот, а в поле ввода уже что-то успели написать
           setValue(""); // очищаем поле ввода
         }
       }
     },
-    [roomId, profile]
+    [profile, dispatch, roomId]
   );
 
-  useEffect(() => {
-    inputRef.current?.focus();
+  // useEffect(() => {
+  //   inputRef.current?.focus();
 
-    const messages = messagesList[roomId] ?? [];
+  //   const lastMessage = messages[messages.length - 1];
+  //   let timerId = null;
 
-    const lastMessage = messages[messages.length - 1];
-    let timerId = null;
+  //   scrollToBottom();
 
-    scrollToBottom();
+  //   if (lastMessage?.author === `${profile.firstName} ${profile.lastName}`) {
+  //     timerId = setTimeout(() => {
+  //       send("Hello! I'm a bot. How are you?", roomId);
+  //     }, 1500);
+  //   }
 
-    if (lastMessage?.author === `${profile.firstName} ${profile.lastName}`) {
-      timerId = setTimeout(() => {
-        sendMessage("Hello! I'm a bot. How are you?", roomId);
-      }, 1500);
-    }
-
-    return () => {
-      clearInterval(timerId);
-    };
-  }, [sendMessage, messagesList, roomId, profile]);
+  //   return () => {
+  //     clearInterval(timerId);
+  //   };
+  // }, [send, messages, roomId, profile]);
 
   const handlePressInput = ({ code }) => {
     if (code === "Enter" || code === "NumpadEnter") {
-      sendMessage(value);
+      send(value);
     }
   };
-
-  const messages = messagesList[roomId] ?? [];
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.chat}>
         {messages.map((message) => (
-          <Message message={message} key={message.id} />
+          <Message message={message} key={message.id} roomId={roomId} />
         ))}
         <div ref={messagesRef} />
       </div>
