@@ -1,5 +1,5 @@
 import * as React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -62,6 +62,8 @@ const menu = [
 ];
 
 export function Header() {
+  const navigate = useNavigate();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   // const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -219,7 +221,7 @@ export function Header() {
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
-              onClick={() => window.location.assign("/profile")}
+              onClick={() => navigate("/profile")}
               color="inherit"
             >
               <AccountCircle />

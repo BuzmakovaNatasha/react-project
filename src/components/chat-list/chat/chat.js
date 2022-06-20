@@ -1,9 +1,16 @@
 import * as React from "react";
+import { useMemo } from "react";
+// import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import styled from "@emotion/styled";
+import styles from "./chat.module.scss";
+import { lastMessageSelector } from "../../../store/conversations";
 
 const ListItemStyles = styled(ListItem)`
   &.Mui-selected {
@@ -14,7 +21,7 @@ const ListItemStyles = styled(ListItem)`
   }
 `;
 
-export function Chat({ chat, selected }) {
+export function Chat({ chat, selected, deleteConversationByName }) {
   function stringToColor(string) {
     let hash = 0;
     let i;
@@ -36,13 +43,26 @@ export function Chat({ chat, selected }) {
   }
 
   function stringAvatar(name) {
+    let initials = "";
+    if (name.split(" ").length > 1) {
+      initials = `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`;
+    } else {
+      initials = `${name.split(" ")[0][0]}`;
+    }
+
     return {
       sx: {
         bgcolor: stringToColor(name),
       },
-      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+      children: initials,
     };
   }
+
+  // const { roomId } = useParams();
+
+  const selectorLastMessage = useMemo(() => lastMessageSelector(chat), [chat]);
+
+  const lastMessage = useSelector(selectorLastMessage);
 
   return (
     <ListItemStyles button={true} selected={selected}>
@@ -53,11 +73,18 @@ export function Chat({ chat, selected }) {
         <ListItemText
           primary={chat.name}
           secondary={
-            <React.Fragment>
-              {chat.name}: {chat.text}
-            </React.Fragment>
+            lastMessage && `${lastMessage.author}: ${lastMessage.message}`
           }
         />
+        <IconButton
+          aria-label="delete"
+          size="small"
+          onClick={(event) => {
+            deleteConversationByName(chat.id, chat.name, event);
+          }}
+        >
+          <DeleteIcon className={styles.deleteIcon} fontSize="inherit" />
+        </IconButton>
       </ListItem>
     </ListItemStyles>
   );
