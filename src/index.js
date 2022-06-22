@@ -3,9 +3,10 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 import { Header } from "./components";
 import { ProfilePage, ChatPage } from "./pages";
-import { store } from "./store";
+import { store, persistor } from "./store";
 import "./global.scss";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -21,17 +22,19 @@ const theme = createTheme({
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <Header />
-          <Routes>
-            <Route path="/" element={<ProfilePage />} />
-            <Route path="/chat/*" element={<ChatPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="*" element={<h1>404</h1>} />
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
+      <PersistGate persistor={persistor}>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <Header />
+            <Routes>
+              <Route path="/" element={<ProfilePage />} />
+              <Route path="/chat/*" element={<ChatPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="*" element={<h1>404</h1>} />
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );

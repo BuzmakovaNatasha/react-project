@@ -7,13 +7,12 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-// import { nanoid } from "nanoid";
 import { Input, InputAdornment } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import styles from "./message-list.module.scss";
 import { Message } from "./message";
 import {
-  sendMessage,
+  sendMessageWithBot,
   messagesSelector,
   profileSelector,
 } from "../../store/messages";
@@ -47,19 +46,7 @@ export function MessageList() {
   const send = useCallback(
     (message, author = `${profile.firstName} ${profile.lastName}`) => {
       if (message) {
-        dispatch(sendMessage(roomId, { message, author }));
-        // setMessagesList((state) => ({
-        //   ...state,
-        //   [roomId]: [
-        //     ...(state[roomId] ?? []),
-        //     {
-        //       author,
-        //       message,
-        //       id: nanoid(),
-        //       date: new Date(),
-        //     },
-        //   ],
-        // }));
+        dispatch(sendMessageWithBot(roomId, profile, { message, author }));
         if (author === `${profile.firstName} ${profile.lastName}`) {
           // проверка для того, чтобы поле ввода не очищалось, если ответил бот, а в поле ввода уже что-то успели написать
           setValue(""); // очищаем поле ввода
@@ -69,30 +56,16 @@ export function MessageList() {
     [profile, dispatch, roomId]
   );
 
-  // useEffect(() => {
-  //   inputRef.current?.focus();
-
-  //   const lastMessage = messages[messages.length - 1];
-  //   let timerId = null;
-
-  //   scrollToBottom();
-
-  //   if (lastMessage?.author === `${profile.firstName} ${profile.lastName}`) {
-  //     timerId = setTimeout(() => {
-  //       send("Hello! I'm a bot. How are you?", roomId);
-  //     }, 1500);
-  //   }
-
-  //   return () => {
-  //     clearInterval(timerId);
-  //   };
-  // }, [send, messages, roomId, profile]);
-
   const handlePressInput = ({ code }) => {
     if (code === "Enter" || code === "NumpadEnter") {
       send(value);
     }
   };
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div className={styles.wrapper}>
@@ -117,7 +90,7 @@ export function MessageList() {
             {value && (
               <Send
                 onClick={() => {
-                  sendMessage(value);
+                  send(value);
                 }}
                 color={"primary"}
                 cursor={"pointer"}

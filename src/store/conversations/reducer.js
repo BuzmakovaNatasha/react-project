@@ -21,7 +21,6 @@ export const conversationsReducer = (state = initialState, action) => {
         conversations: [...state.conversations, action.payload],
       };
     case DELETE_CONVERSATION:
-      console.log(action.payload);
       return {
         ...state,
         conversations: state.conversations.filter(

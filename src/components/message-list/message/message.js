@@ -1,8 +1,8 @@
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
-import styles from "./message.module.scss";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
+import styles from "./message.module.scss";
 import { deleteMessage } from "../../../store/messages";
 
 export const Message = ({ message, roomId }) => {

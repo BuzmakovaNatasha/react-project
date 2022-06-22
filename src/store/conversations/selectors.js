@@ -4,6 +4,5 @@ export const conversationsSelector = (state) => {
 
 export const lastMessageSelector = (chat) => (state) => {
   const messages = state.messages.messages[chat.name] ?? [];
-  console.log("last");
   return messages[messages.length - 1];
 };
