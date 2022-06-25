@@ -14,7 +14,7 @@ import {
 } from "../../store/conversations";
 
 export function ChatList() {
-  const conversations = useSelector(conversationsSelector);
+  const { conversations, pending } = useSelector(conversationsSelector);
 
   const { roomId } = useParams();
   const dispatch = useDispatch();
@@ -48,15 +48,19 @@ export function ChatList() {
         Create room
       </Button>
       <List>
-        {conversations.map((chat) => (
-          <Link key={chat.id} to={`/chat/${chat.name}`}>
-            <Chat
-              chat={chat}
-              deleteConversationByName={deleteConversationByName}
-              selected={roomId === chat.name}
-            />
-          </Link>
-        ))}
+        {pending ? (
+          <h1>pending ...</h1>
+        ) : (
+          conversations.map((chat) => (
+            <Link key={chat.id} to={`/chat/${chat.name}`}>
+              <Chat
+                chat={chat}
+                deleteConversationByName={deleteConversationByName}
+                selected={roomId === chat.name}
+              />
+            </Link>
+          ))
+        )}
       </List>
     </div>
   );

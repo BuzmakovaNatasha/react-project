@@ -1,4 +1,8 @@
 export const conversationsSelector = (state) => {
+  return state.conversations;
+};
+
+export const conversationsSelectorConversations = (state) => {
   return state.conversations.conversations;
 };
 
