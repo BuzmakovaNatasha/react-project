@@ -46,7 +46,12 @@ export function MessageList() {
   const send = useCallback(
     (message, author = `${profile.firstName} ${profile.lastName}`) => {
       if (message) {
-        dispatch(sendMessageWithBot(roomId, profile, { message, author }));
+        dispatch(
+          sendMessageWithBot(roomId, profile, {
+            message,
+            author,
+          })
+        );
         if (author === `${profile.firstName} ${profile.lastName}`) {
           // проверка для того, чтобы поле ввода не очищалось, если ответил бот, а в поле ввода уже что-то успели написать
           setValue(""); // очищаем поле ввода

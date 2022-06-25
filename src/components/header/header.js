@@ -1,5 +1,6 @@
 import * as React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -15,6 +16,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { auth } from "../../api/firebase";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -56,13 +59,19 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const menu = [
+const menuWithSession = [
   { title: "Home", to: "/" },
   { title: "Chat", to: "/chat" },
   { title: "Gists", to: "/gists" },
 ];
 
-export function Header() {
+const menuWithoutSession = [
+  { title: "Home", to: "/" },
+  { title: "SignUp", to: "/sign-up" },
+  { title: "Login", to: "/login" },
+];
+
+export function Header({ session }) {
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -101,13 +110,22 @@ export function Header() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      {menu.map((item) => (
-        <MenuItem key={item.title}>
-          <NavLink onClick={handleMenuClose} to={item.to}>
-            {item.title}
-          </NavLink>
-        </MenuItem>
-      ))}
+      {!!session &&
+        menuWithSession.map((item) => (
+          <MenuItem key={item.title}>
+            <NavLink onClick={handleMenuClose} to={item.to}>
+              {item.title}
+            </NavLink>
+          </MenuItem>
+        ))}
+      {!session &&
+        menuWithoutSession.map((item) => (
+          <MenuItem key={item.title}>
+            <NavLink onClick={handleMenuClose} to={item.to}>
+              {item.title}
+            </NavLink>
+          </MenuItem>
+        ))}
       {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
       {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
     </Menu>
@@ -216,17 +234,30 @@ export function Header() {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={() => navigate("/profile")}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            {!!session && (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-haspopup="true"
+                onClick={() => navigate("/profile")}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            )}
+            {!!session && (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="log out of the current user account"
+                aria-haspopup="true"
+                onClick={() => signOut(auth)}
+                color="inherit"
+              >
+                <LogoutIcon />
+              </IconButton>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
